@@ -1,6 +1,6 @@
 # Minimalist Home Server Dashboard  --THIS IS A DEMO
 
-A demo version of a sleek, single-file home lab dashboard. Open in any modern browser — no Node.js, no build steps, fully functional for demonstration purposes.
+A demo version of a sleek, home lab dashboard. Open in any modern browser — no Node.js, no build steps, fully functional for demonstration purposes.
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
@@ -43,4 +43,5 @@ Click the **Settings Gear (⚙️)** to:
 ## 📄 License
 
 MIT License. Free to use and modify for your personal homelab.
+
 
