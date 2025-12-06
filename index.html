@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* 🎨 Color Variables */
+            --bg-light: #f4f4f9;
+            --bg-dark: #121212;
+            --card-light: #ffffff;
+            --card-dark: #1e1e1e;
+            --text-light: #333333;
+            --text-dark: #f0f0f0;
+            --text-muted-light: #888888;
+            --text-muted-dark: #aaaaaa;
+
+            /* Accents (User Editable) */
+            --accent: #A78BFA;
+            /* Default Pastel Purple */
+
+            /* Spacing */
+            --radius: 20px;
+            --shadow-light: 0 10px 30px rgba(0, 0, 0, 0.04);
+            --shadow-dark: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+            /* Transitions */
+            --ease: cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* 🖼️ Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--muted);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* 🌙 Dark Mode Support */
+        body[data-theme="light"] {
+            --bg: var(--bg-light);
+            --card: var(--card-light);
+            --text: var(--text-light);
+            --muted: var(--text-muted-light);
+            --shadow: var(--shadow-light);
+        }
+
+        body[data-theme="dark"] {
+            --bg: var(--bg-dark);
+            --card: var(--card-dark);
+            --text: var(--text-dark);
+            --muted: var(--text-muted-dark);
+            --shadow: var(--shadow-dark);
+        }
+
+        /* Global Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text);
+            transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        /* 🖼️ Custom BG Overlay */
+        body.has-custom-bg::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            /* Dim for readability */
+            z-index: -1;
+        }
+
+        body.has-custom-bg .card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+        }
+
+        body[data-theme="dark"].has-custom-bg .card {
+            background: rgba(30, 30, 30, 0.7);
+        }
+
+        /* 🏠 Container */
+        .dashboard {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            animation: fadeIn 0.8s var(--ease);
+        }
+
+        /* ✨ Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .greeting h1 {
+            font-weight: 600;
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+        }
+
+        .greeting p {
+            color: var(--muted);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        .greeting span.highlight {
+            color: var(--accent);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Weather Widget (Header) */
+        .weather-mini {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card);
+            padding: 8px 16px;
+            border-radius: 50px;
+            box-shadow: var(--shadow);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .weather-icon {
+            font-size: 1.2rem;
+        }
+
+        .icon-btn {
+            background: var(--card);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            color: var(--text);
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: transform 0.2s var(--ease);
+            display: grid;
+            place-items: center;
+            font-size: 1.1rem;
+        }
+
+        .icon-btn:hover {
+            transform: scale(1.08);
+        }
+
+        /* 🧩 Grid System */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+
+        .grid-apps {
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        }
+
+        /* 🎴 Cards */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            /* Subtle border for glass feel */
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+            border-color: var(--accent);
+        }
+
+        /* Glassmorphism Utility */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        body[data-theme="dark"] .glass {
+            background: rgba(30, 30, 30, 0.6);
+        }
+
+        /* 📊 System Stats */
+        .stat-card {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--muted);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .progress-bg {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: auto;
+        }
+
+        .dark .progress-bg {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 10px;
+            transition: width 1s var(--ease);
+        }
+
+        /* 📱 Quick Apps */
+        .app-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text);
+            padding: 24px 12px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .app-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            background: rgba(167, 139, 250, 0.1);
+            color: var(--accent);
+            display: grid;
+            place-items: center;
+            font-size: 1.5rem;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .app-card:hover .app-icon {
+            background: var(--accent);
+            color: white;
+        }
+
+        .app-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* 🎬 Posters Wall */
+        .poster-container {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            scroll-snap-type: x mandatory;
+        }
+
+        .poster-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .poster-container::-webkit-scrollbar-thumb {
+            background: var(--muted);
+            border-radius: 10px;
+        }
+
+        .poster-card {
+            min-width: 160px;
+            height: 240px;
+            border-radius: 12px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            scroll-snap-align: start;
+            cursor: pointer;
+            transition: transform 0.3s var(--ease);
+            box-shadow: var(--shadow);
+            background-color: var(--card);
+            /* Fallback */
+            display: grid;
+            place-items: center;
+        }
+
+        .poster-card:hover {
+            transform: scale(1.05);
+            z-index: 2;
+        }
+
+        .poster-delete {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .poster-card:hover .poster-delete {
+            opacity: 1;
+        }
+
+        .add-poster-card {
+            min-width: 160px;
+            height: 240px;
+            border: 2px dashed var(--muted);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--muted);
+            cursor: pointer;
+            gap: 8px;
+        }
+
+        .add-poster-card:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* 📝 Notepad */
+        .notepad-area {
+            width: 100%;
+            height: 150px;
+            background: transparent;
+            border: none;
+            resize: none;
+            outline: none;
+            color: var(--text);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .notepad-area::placeholder {
+            color: var(--muted);
+        }
+
+        /* 🔐 Login Overlay */
+        #login-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.6s var(--ease);
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 48px;
+            border-radius: 32px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        body[data-theme="dark"] .login-card {
+            background: rgba(30, 30, 30, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .login-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text);
+            letter-spacing: -0.5px;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+
+        /* ⌨️ Server Shortcuts */
+        .shortcuts-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .shortcut-btn {
+            padding: 10px 20px;
+            background: var(--card);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .shortcut-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* ⚙️ Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: var(--card);
+            padding: 32px;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            transform: scale(0.9);
+            transition: transform 0.3s var(--ease);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--muted);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .color-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .color-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .color-dot:hover {
+            transform: scale(1.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Media Modal */
+        .media-modal-img {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+
+<body data-theme="dark">
+
+    <!-- Login Layer -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <div class="login-title">Welcome Back</div>
+            <div class="form-group">
+                <input type="text" class="form-input" id="login-user" placeholder="Username" style="text-align:center;">
+            </div>
+            <div class="form-group">
+                <input type="password" class="form-input" id="login-pass" placeholder="Password"
+                    style="text-align:center;">
+            </div>
+            <button class="login-btn" id="login-submit">Login</button>
+            <p id="login-msg" style="color:#ef4444; font-size:0.85rem; margin-top:12px; display:none;">Invalid
+                Credentials</p>
+        </div>
+    </div>
+
+    <div class="dashboard">
+
+        <!-- Header -->
+        <header>
+            <div class="greeting">
+                <h1>Hello, <span class="highlight" id="user-name">User</span></h1>
+                <p id="date-display">Thinking...</p>
+            </div>
+            <div class="header-actions">
+                <div class="weather-mini animate-pulse" id="weather-widget">
+                    <span class="weather-icon">🌤️</span> <span id="weather-temp">--°</span>
+                </div>
+                <button class="icon-btn" id="theme-btn" title="Toggle Theme"><i class="fa-solid fa-moon"></i></button>
+                <button class="icon-btn" id="settings-btn" title="Settings"><i class="fa-solid fa-gear"></i></button>
+            </div>
+        </header>
+
+        <!-- 1. System Stats -->
+        <section>
+            <div class="section-title">System Status <button class="icon-btn"
+                    style="width:24px;height:24px;font-size:0.8rem;" id="refresh-stats"><i
+                        class="fa-solid fa-rotate-right"></i></button></div>
+            <div class="card-grid grid-3">
+                <div class="card stat-card">
+                    <div class="stat-header"><span>CPU Load</span> <i class="fa-solid fa-microchip"></i></div>
+                    <div class="stat-value" id="cpu-val">--%</div>
+                    <div class="progress-bg">
+                        <div class="progress-fill" id="cpu-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-header"><span>RAM Usage</span> <i class="fa-solid fa-memory"></i></div>
+                    <div class="stat-value" id="ram-val">--%</div>
+                    <div class="progress-bg">
+                        <div class="progress-fill" id="ram-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-header"><span>Disk (ZFS)</span> <i class="fa-solid fa-hard-drive"></i></div>
+                    <div class="stat-value" id="disk-val">--%</div>
+                    <div class="progress-bg">
+                        <div class="progress-fill" id="disk-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Quick Apps -->
+        <section>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <div class="section-title" style="margin-bottom:0;">Applications</div>
+                <input type="text" id="app-search" placeholder="Search apps..."
+                    style="background:var(--card); border:none; padding:8px 16px; border-radius:20px; color:var(--text); outline:none; font-size:0.9rem; box-shadow:var(--shadow);">
+            </div>
+            <div class="card-grid grid-apps" id="apps-container">
+                <a href="#" class="card app-card">
+                    <div class="app-icon"><i class="fa-solid fa-cloud"></i></div>
+                    <div class="app-title">Nextcloud</div>
+                </a>
+                <a href="#" class="card app-card">
+                    <div class="app-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="app-title">Pi-hole</div>
+                </a>
+                <a href="#" class="card app-card">
+                    <div class="app-icon"><i class="fa-solid fa-film"></i></div>
+                    <div class="app-title">Jellyfin</div>
+                </a>
+                <a href="#" class="card app-card">
+                    <div class="app-icon"><i class="fa-solid fa-house"></i></div>
+                    <div class="app-title">Home Asst</div>
+                </a>
+                <a href="#" class="card app-card">
+                    <div class="app-icon"><i class="fa-solid fa-folder-open"></i></div>
+                    <div class="app-title">FileBrowser</div>
+                </a>
+                <a href="#" class="card app-card">
+                    <div class="app-icon"><i class="fa-solid fa-magnet"></i></div>
+                    <div class="app-title">QBittorrent</div>
+                </a>
+                <a href="#" class="card app-card">
+                    <div class="app-icon"><i class="fa-brands fa-docker"></i></div>
+                    <div class="app-title">Portainer</div>
+                </a>
+                <a href="#" class="card app-card">
+                    <div class="app-icon"><i class="fa-solid fa-network-wired"></i></div>
+                    <div class="app-title">Router</div>
+                </a>
+                <a href="#" class="card app-card">
+                    <div class="app-icon"><i class="fa-solid fa-gauge-high"></i></div>
+                    <div class="app-title">Speedtest</div>
+                </a>
+                <a href="#" class="card app-card">
+                    <div class="app-icon"><i class="fa-solid fa-terminal"></i></div>
+                    <div class="app-title">Terminal</div>
+                </a>
+            </div>
+        </section>
+
+        <!-- 2.5 Notepad -->
+        <section>
+            <div class="section-title">Notepad <i class="fa-regular fa-note-sticky"
+                    style="color:var(--muted); font-size:0.9rem;"></i></div>
+            <div class="card">
+                <textarea class="notepad-area" id="notepad-input"
+                    placeholder="Type your notes here... (Saved automatically)"></textarea>
+            </div>
+        </section>
+
+        <!-- 3. Poster Wall -->
+        <section>
+            <div class="section-title">My Movies <span
+                    style="font-size:0.8rem;color:var(--muted);font-weight:400;">(Local Preview)</span></div>
+            <div class="poster-container" id="poster-wall">
+                <!-- Posters Injected JS -->
+                <div class="add-poster-card" id="add-poster-btn">
+                    <i class="fa-solid fa-plus" style="font-size:1.5rem;"></i>
+                    <span>Add Poster</span>
+                </div>
+                <input type="file" id="poster-input" accept="image/*" hidden>
+            </div>
+        </section>
+
+        <!-- 4. Shortcuts -->
+        <section>
+            <div class="section-title">Server Controls</div>
+            <div class="shortcuts-row">
+                <button class="shortcut-btn" onclick="mockAction('System Reboot')"><i class="fa-solid fa-power-off"></i>
+                    Reboot</button>
+                <button class="shortcut-btn" onclick="mockAction('System Shutdown')"><i class="fa-solid fa-plug"></i>
+                    Shutdown</button>
+                <button class="shortcut-btn" onclick="mockAction('Log Dump')"><i class="fa-solid fa-file-lines"></i>
+                    Check Logs</button>
+                <button class="shortcut-btn" onclick="mockAction('Apt Update')"><i class="fa-solid fa-rotate"></i>
+                    Update Pkgs</button>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Modals -->
+    <!-- Settings -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal">
+            <h2>Dashboard Settings</h2>
+            <div class="form-group">
+                <label>Display Name</label>
+                <input type="text" class="form-input" id="set-name" value="User">
+            </div>
+            <div class="form-group">
+                <label>Background Image URL (Optional)</label>
+                <input type="text" class="form-input" id="set-bg"
+                    placeholder="https://source.unsplash.com/random/1920x1080">
+            </div>
+            <div class="form-group">
+                <label>Weather City (Lat, Lon)</label>
+                <input type="text" class="form-input" id="set-city" placeholder="51.50, -0.12">
+            </div>
+            <div class="form-group">
+                <label>Accent Color</label>
+                <div class="color-options">
+                    <div class="color-dot" style="background:#A78BFA" onclick="changeAccent('#A78BFA')"></div>
+                    <!-- Purple -->
+                    <div class="color-dot" style="background:#60A5FA" onclick="changeAccent('#60A5FA')"></div>
+                    <!-- Blue -->
+                    <div class="color-dot" style="background:#34D399" onclick="changeAccent('#34D399')"></div>
+                    <!-- Green -->
+                    <div class="color-dot" style="background:#F472B6" onclick="changeAccent('#F472B6')"></div>
+                    <!-- Pink -->
+                    <div class="color-dot" style="background:#FBBF24" onclick="changeAccent('#FBBF24')"></div>
+                    <!-- Orange -->
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-ghost" onclick="doLogout()" style="color:#ef4444; margin-right:auto;"><i
+                        class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+                <button class="btn-ghost" onclick="closeModal('settings-modal')">Cancel</button>
+                <button class="btn-primary" onclick="saveSettings()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Modal -->
+    <div class="modal-overlay" id="action-modal">
+        <div class="modal" style="text-align:center;">
+            <i class="fa-solid fa-lock" style="font-size:3rem;color:var(--muted);margin-bottom:16px;"></i>
+            <h2 id="action-title">Action Required</h2>
+            <p style="color:var(--muted);line-height:1.5;">This action requires backend access (Node.js/Go).<br>Since
+                this is a standalone demo, I can't actually touch the server! 😅</p>
+            <div class="modal-actions" style="justify-content:center;">
+                <button class="btn-primary" onclick="closeModal('action-modal')">Got it</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Media View Modal -->
+    <div class="modal-overlay" id="media-modal" onclick="closeModal('media-modal')">
+        <img id="media-view-img" class="media-modal-img" src="">
+    </div>
+
+    <script>
+        // 💾 State & Config
+        const CONFIG = {
+            defaultName: "Dhyandev",
+            defaultCity: { lat: 12.97, lon: 77.59 }, // Bangalore approx
+            defaultTheme: 'dark',
+            defaultAccent: '#A78BFA',
+            defaultBg: ''
+        };
+
+        const state = {
+            name: localStorage.getItem('dash_name') || CONFIG.defaultName,
+            theme: localStorage.getItem('dash_theme') || CONFIG.defaultTheme,
+            city: JSON.parse(localStorage.getItem('dash_city')) || CONFIG.defaultCity,
+            accent: localStorage.getItem('dash_accent') || CONFIG.defaultAccent,
+            bg: localStorage.getItem('dash_bg') || CONFIG.defaultBg,
+            notes: localStorage.getItem('dash_notes') || "",
+            posters: JSON.parse(localStorage.getItem('dash_posters')) || [
+                "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", // Mario
+                "https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi51Cztnpq8MX.jpg", // Barbie
+                "https://image.tmdb.org/t/p/w500/z9Y5Fc0tTHdYcrhzeImtq4m7tPI.jpg", // Spy x Family
+                "https://image.tmdb.org/t/p/w500/rtGDOeG9LzoerkDGZF9dnZhJHw9.jpg", // Totoro
+                "https://image.tmdb.org/t/p/w500/fiVW06jE7z9YnO4trhaMEdclSiC.jpg"  // Fast X
+            ]
+        };
+
+        // 🚀 Init
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth(); // 🔐 Check Login First
+
+            applyState();
+            updateTime();
+            fetchWeather();
+            randomizeStats();
+            renderPosters();
+
+            // Login Events
+            document.getElementById('login-submit').addEventListener('click', handleLogin);
+            document.getElementById('login-pass').addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin() });
+
+            // Intervals
+            setInterval(updateTime, 60000);
+            setInterval(randomizeStats, 3000);
+
+            // Events
+            document.getElementById('theme-btn').addEventListener('click', toggleTheme);
+            document.getElementById('settings-btn').addEventListener('click', () => openModal('settings-modal'));
+
+            // Poster Upload
+            document.getElementById('add-poster-btn').addEventListener('click', () => document.getElementById('poster-input').click());
+            document.getElementById('poster-input').addEventListener('change', handlePosterUpload);
+
+            // Stats Refresh
+            document.getElementById('refresh-stats').addEventListener('click', () => {
+                randomizeStats();
+                document.getElementById('refresh-stats').querySelector('i').classList.add('fa-spin');
+                setTimeout(() => document.getElementById('refresh-stats').querySelector('i').classList.remove('fa-spin'), 1000);
+            });
+
+            // Search
+            document.getElementById('app-search').addEventListener('input', handleSearch);
+
+            // Notepad
+            const noteInput = document.getElementById('notepad-input');
+            noteInput.value = state.notes;
+            noteInput.addEventListener('input', (e) => {
+                state.notes = e.target.value;
+                localStorage.setItem('dash_notes', state.notes);
+            });
+        });
+
+        // 🎨 UI Logic
+        function checkAuth() {
+            const isAuth = localStorage.getItem('dash_auth');
+            if (isAuth === 'true') {
+                document.getElementById('login-overlay').style.display = 'none';
+            } else {
+                document.getElementById('login-overlay').style.display = 'flex';
+            }
+        }
+
+        function handleLogin() {
+            const u = document.getElementById('login-user').value;
+            const p = document.getElementById('login-pass').value;
+            const card = document.querySelector('.login-card');
+            const msg = document.getElementById('login-msg');
+
+            if (u === 'dhyandev' && p === 'keerthana') {
+                localStorage.setItem('dash_auth', 'true');
+                const overlay = document.getElementById('login-overlay');
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.style.display = 'none', 500);
+            } else {
+                card.classList.remove('shake');
+                void card.offsetWidth; // trigger reflow
+                card.classList.add('shake');
+                msg.style.display = 'block';
+            }
+        }
+
+        function doLogout() {
+            if (!confirm("Log out?")) return;
+            localStorage.removeItem('dash_auth');
+            location.reload();
+        }
+
+        function applyState() {
+            document.body.setAttribute('data-theme', state.theme);
+            document.documentElement.style.setProperty('--accent', state.accent);
+            document.getElementById('user-name').textContent = state.name;
+
+            // Background
+            if (state.bg && state.bg.trim() !== "") {
+                document.body.style.backgroundImage = `url('${state.bg}')`;
+                document.body.classList.add('has-custom-bg');
+            } else {
+                document.body.style.backgroundImage = 'none';
+                document.body.classList.remove('has-custom-bg');
+            }
+
+            // Init Setting Inputs
+            document.getElementById('set-name').value = state.name;
+            document.getElementById('set-bg').value = state.bg;
+            document.getElementById('set-city').value = `${state.city.lat}, ${state.city.lon}`;
+
+            const icon = document.getElementById('theme-btn').querySelector('i');
+            icon.className = state.theme === 'light' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+        }
+
+        function toggleTheme() {
+            state.theme = state.theme === 'light' ? 'dark' : 'light';
+            localStorage.setItem('dash_theme', state.theme);
+            applyState();
+        }
+
+        function changeAccent(color) {
+            state.accent = color;
+            document.documentElement.style.setProperty('--accent', color);
+            // Don't save yet, wait for save button
+        }
+
+        function saveSettings() {
+            const newName = document.getElementById('set-name').value;
+            const newBg = document.getElementById('set-bg').value;
+            const cityStr = document.getElementById('set-city').value;
+
+            state.name = newName;
+            state.bg = newBg;
+            state.accent = document.documentElement.style.getPropertyValue('--accent'); // Get currently previewed
+
+            // Parse City
+            const [lat, lon] = cityStr.split(',').map(s => parseFloat(s.trim()));
+            if (!isNaN(lat) && !isNaN(lon)) state.city = { lat, lon };
+
+            localStorage.setItem('dash_name', state.name);
+            localStorage.setItem('dash_bg', state.bg);
+            localStorage.setItem('dash_city', JSON.stringify(state.city));
+            localStorage.setItem('dash_accent', state.accent);
+
+            applyState();
+            fetchWeather(); // Refresh weather with new city
+            closeModal('settings-modal');
+        }
+
+        // 🔍 Search
+        function handleSearch(e) {
+            const term = e.target.value.toLowerCase();
+            const apps = document.querySelectorAll('.app-card');
+            apps.forEach(app => {
+                const title = app.querySelector('.app-title').textContent.toLowerCase();
+                app.style.display = title.includes(term) ? 'flex' : 'none';
+            });
+        }
+
+        // 🌦️ Functions
+        function updateTime() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+            document.getElementById('date-display').textContent = dateStr;
+        }
+
+        async function fetchWeather() {
+            // Free API: Open-Meteo
+            try {
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${state.city.lat}&longitude=${state.city.lon}&current_weather=true`);
+                const data = await res.json();
+                const temp = Math.round(data.current_weather.temperature);
+                document.getElementById('weather-temp').textContent = `${temp}°C`;
+                document.getElementById('weather-widget').classList.remove('animate-pulse');
+            } catch (e) {
+                console.warn("Weather API unreachable, using offline fallback.");
+                document.getElementById('weather-temp').textContent = "--°";
+                document.getElementById('weather-widget').classList.remove('animate-pulse');
+            }
+        }
+
+        function randomizeStats() {
+            const cpu = Math.floor(Math.random() * 60) + 10;
+            const ram = Math.floor(Math.random() * 40) + 30;
+            const disk = 42; // Static-ish
+
+            updateStat('cpu', cpu);
+            updateStat('ram', ram);
+            updateStat('disk', disk);
+        }
+
+        function updateStat(id, val) {
+            document.getElementById(`${id}-val`).textContent = `${val}%`;
+            document.getElementById(`${id}-bar`).style.width = `${val}%`;
+        }
+
+        function mockAction(name) {
+            document.getElementById('action-title').textContent = name;
+            openModal('action-modal');
+        }
+
+        // 🖼️ Posters Logic
+        function handlePosterUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const base64 = event.target.result;
+                // Basic quota check (5MB LS limit)
+                if (JSON.stringify(state.posters).length + base64.length > 4500000) {
+                    alert("Storage full! Please delete some posters.");
+                    return;
+                }
+
+                state.posters.push(base64);
+                localStorage.setItem('dash_posters', JSON.stringify(state.posters));
+                renderPosters();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function renderPosters() {
+            const wall = document.getElementById('poster-wall');
+            const addBtn = document.getElementById('add-poster-btn');
+
+            // clear existing posters (keep add button)
+            Array.from(wall.children).forEach(c => {
+                if (c.id !== 'add-poster-btn' && c.id !== 'poster-input') wall.removeChild(c);
+            });
+
+            state.posters.forEach((imgSrc, idx) => {
+                const div = document.createElement('div');
+                div.className = 'poster-card';
+                div.style.backgroundImage = `url(${imgSrc})`;
+                div.onclick = (e) => {
+                    if (e.target.classList.contains('poster-delete')) return;
+                    viewMedia(imgSrc);
+                }
+
+                const del = document.createElement('div');
+                del.className = 'poster-delete';
+                del.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                del.onclick = () => deletePoster(idx);
+
+                div.appendChild(del);
+                wall.insertBefore(div, addBtn);
+            });
+        }
+
+        function deletePoster(idx) {
+            if (!confirm("Delete this poster?")) return;
+            state.posters.splice(idx, 1);
+            localStorage.setItem('dash_posters', JSON.stringify(state.posters));
+            renderPosters();
+        }
+
+        function viewMedia(src) {
+            document.getElementById('media-view-img').src = src;
+            openModal('media-modal');
+        }
+
+        // 🚪 Modal Utils
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+    </script>
+</body>
+
+</html>
