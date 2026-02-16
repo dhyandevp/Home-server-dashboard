@@ -1,97 +1,68 @@
 # Home Server Management Platform
 
-A lightweight, production-ready homelab control panel inspired by UmbrelOS/CasaOS/TrueNAS SCALE with a modular architecture.
+A lightweight, production-oriented homelab platform inspired by UmbrelOS, CasaOS, and TrueNAS SCALE.
 
-## Architecture Summary
-Detailed architecture and scaling design is documented in `docs/ARCHITECTURE.md`.
+## What was improved
+- Added architecture-first documentation and modular monorepo structure.
+- Expanded backend with API usage analytics, metric history, alert evaluation, backup import/export, compose deployment scaffold, and richer plugin lifecycle APIs.
+- Expanded frontend dashboard with:
+  - Dark/light mode toggle
+  - Container action controls (start/stop/restart)
+  - Plugin enable/disable controls
+  - CPU history sparkline
+  - Alert rule quick-create panel
+  - API usage analytics panel
+- Added session timeout scaffolding and optional 2FA code field.
 
-### Stack
-- **Frontend**: React + Vite + Tailwind (dark-first responsive UI)
-- **Backend**: Express + Socket.IO (REST + realtime)
-- **Database**: PostgreSQL schema via Prisma (`backend/prisma/schema.prisma`)
-- **Container runtime**: Docker socket integration (`dockerode`)
+## Stack
+- Frontend: React + Vite + TailwindCSS
+- Backend: Express + Socket.IO
+- Database schema: Prisma (PostgreSQL)
+- Docker integration: dockerode
 
 ## Folder Structure
-
 ```text
 .
-├── backend
-│   ├── prisma
-│   │   └── schema.prisma
-│   ├── src
-│   │   ├── config
-│   │   ├── middleware
-│   │   ├── plugins
-│   │   ├── routes
-│   │   ├── services
-│   │   ├── ws
-│   │   ├── app.ts
-│   │   └── server.ts
-│   ├── tests
-│   └── Dockerfile
-├── frontend
-│   ├── src
-│   │   ├── components
-│   │   ├── hooks
-│   │   ├── pages
-│   │   ├── services
-│   │   ├── App.tsx
-│   │   └── main.tsx
-│   └── Dockerfile
-├── docs
-│   └── ARCHITECTURE.md
+├── backend/
+│   ├── prisma/schema.prisma
+│   ├── src/
+│   │   ├── middleware/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   └── ws/
+│   └── tests/
+├── frontend/
+│   └── src/
+│       ├── components/
+│       ├── hooks/
+│       ├── pages/
+│       └── services/
+├── docs/ARCHITECTURE.md
 ├── docker-compose.yml
 └── .env.example
 ```
 
+## Implemented Features
+1. **Dashboard Overview**: realtime CPU/RAM/disk/network/uptime/temp + history panel.
+2. **Docker Manager**: list containers + start/stop/restart + logs + compose deploy scaffold.
+3. **Service Marketplace**: plugin auto-discovery + install/toggle/delete endpoints.
+4. **Reverse Proxy Manager**: domain->target records + nginx snippet preview.
+5. **File Manager**: sandboxed list/read/write/upload APIs.
+6. **Logs Center**: audit logs, search filter, JSON export.
+7. **Monitoring & Alerts**: alert rules + in-memory notification events.
+8. **Authentication & Security**: JWT, RBAC, login limiter, API limiter, helmet, session timeout scaffold.
+9. **API Layer**: REST + Socket.IO + Swagger docs + API usage stats endpoint.
+10. **Mobile Mode**: responsive Tailwind layout and compact controls.
+
 ## Database Schema
-Defined in `backend/prisma/schema.prisma` with production entities:
-- `User` (auth + RBAC)
-- `AuditLog` (security/event trail)
-- `Plugin` (marketplace registry)
-- `AlertRule` (monitoring/notification thresholds)
-- `ProxyRoute` (reverse proxy manager records)
+`backend/prisma/schema.prisma`
+- User
+- AuditLog
+- Plugin
+- AlertRule
+- ProxyRoute
 
-## Feature-by-Feature Implementation
-
-### 1) Dashboard Overview
-- Realtime CPU/RAM/Disk/Network/Uptime/Temperature via `Socket.IO` metric events.
-- Frontend metric cards and telemetry panels.
-
-### 2) Docker Manager
-- List containers, start/stop/restart endpoints, and container logs endpoint.
-- Graceful fallback when Docker API is unavailable.
-
-### 3) Service Marketplace (Plugin System)
-- Auto-discovery of plugin descriptors from `backend/src/plugins/*.json`.
-- Enable/disable plugins through API.
-
-### 4) Reverse Proxy Manager
-- Domain + upstream registration endpoint.
-- Auto-generated Nginx server block preview in API response.
-
-### 5) File Manager
-- Sandboxed directory read/write/list/upload endpoints.
-- Root protection via `FILE_MANAGER_ROOT` path resolver.
-
-### 6) Logs Center
-- Audit log collection service and API endpoint.
-
-### 7) Monitoring & Alerts
-- Alert rule CRUD scaffold (`metric`, `threshold`, `channel`, `destination`).
-
-### 8) Authentication & Security
-- JWT login, role checks, rate limiting, helmet headers, and IP-aware audit logs.
-
-### 9) API Layer
-- REST routes under `/api/*`.
-- Swagger docs at `/docs`.
-
-### 10) Mobile Mode
-- Responsive Tailwind grid layouts and touch-friendly controls.
-
-## Run Locally
-
+## Local Development
 ```bash
 npm install
 npm run dev:backend
@@ -99,37 +70,24 @@ npm run dev:frontend
 ```
 
 Default login:
-- email: `admin@homeserver.local`
-- password: `admin123!`
+- `admin@homeserver.local`
+- `admin123!`
 
-## Testing
-
+## Tests
 ```bash
 npm --workspace backend run test
 npm --workspace frontend run test
 ```
 
-## Deployment (Dockerized)
-
+## Deployment (Docker)
 ```bash
 cp .env.example .env
 docker compose up --build
 ```
 
-Services:
-- Frontend: `http://localhost:5173`
-- Backend API: `http://localhost:4000`
-- Swagger: `http://localhost:4000/docs`
-
-## Security Recommendations
-- Replace default JWT secret and admin seed password before first run.
-- Put backend behind TLS reverse proxy (Nginx/Caddy/Traefik).
-- Restrict Docker socket mount to trusted hosts only.
-- Add persistent DB layer (Prisma migrations + managed Postgres backups).
-- Enable 2FA/TOTP in next iteration.
-
-## Performance Tips
-- Reduce metric emission frequency in `ws/socket.ts` for low-power devices.
-- Add Redis cache for plugin/metrics snapshots in multi-node setups.
-- Paginate large log queries and stream download exports.
-- Use frontend code splitting for plugin-specific panels.
+## Security recommendations
+- Rotate JWT secret and default credentials before deployment.
+- Protect Docker socket access.
+- Put behind TLS reverse proxy.
+- Add persistent DB integration + migrations for production.
+- Implement real TOTP verification and webhook delivery workers.

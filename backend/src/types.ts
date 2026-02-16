@@ -14,3 +14,12 @@ export interface PluginDefinition {
   enabled: boolean;
   source: string;
 }
+
+export interface AlertRule {
+  id: string;
+  metric: 'cpu' | 'ram' | 'disk' | 'temperature';
+  threshold: number;
+  channel: 'telegram' | 'discord' | 'email';
+  destination: string;
+  enabled: boolean;
+}

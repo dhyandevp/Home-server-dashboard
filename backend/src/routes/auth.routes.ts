@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { authLimiter } from '../middleware/rate-limit.middleware.js';
 import { authenticate } from '../services/auth.service.js';
 import { auditService } from '../services/audit.service.js';
+import { requireAuth, type AuthRequest } from '../middleware/auth.middleware.js';
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -25,4 +26,8 @@ authRoutes.post('/login', authLimiter, (req, res) => {
 
   auditService.log({ action: 'auth.login', resource: 'auth', userId: result.user.id, ip: req.ip });
   return res.json(result);
+});
+
+authRoutes.get('/me', requireAuth, (req: AuthRequest, res) => {
+  return res.json({ user: req.user });
 });

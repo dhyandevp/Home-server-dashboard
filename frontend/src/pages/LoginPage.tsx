@@ -8,6 +8,7 @@ interface LoginPageProps {
 export function LoginPage({ onAuthenticated }: LoginPageProps) {
   const [email, setEmail] = useState('admin@homeserver.local');
   const [password, setPassword] = useState('admin123!');
+  const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
 
   async function submit(event: FormEvent) {
@@ -15,6 +16,7 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
     try {
       const response = await api.post('/api/auth/login', { email, password });
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('session_expiry', String(Date.now() + 60 * 60 * 1000));
       onAuthenticated();
     } catch {
       setError('Invalid credentials');
@@ -38,6 +40,12 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
           onChange={(e) => setPassword(e.target.value)}
           type="password"
           placeholder="Password"
+        />
+        <input
+          className="w-full rounded-md border border-border bg-base p-3"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+          placeholder="2FA code (optional in scaffold)"
         />
         {error && <p className="text-sm text-red-400">{error}</p>}
         <button className="w-full rounded-md bg-accent p-3 font-medium text-white">Login</button>
