@@ -1,0 +1,7 @@
+{
+  "key": "pihole",
+  "name": "Pi-hole Stats Viewer",
+  "description": "Monitor DNS queries, blocked requests, and upstream performance.",
+  "enabled": false,
+  "source": "core"
+}
