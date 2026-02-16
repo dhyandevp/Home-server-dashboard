@@ -6,8 +6,8 @@ import { auditService } from '../services/audit.service.js';
 import { requireAuth, type AuthRequest } from '../middleware/auth.middleware.js';
 
 const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8)
+  email: z.string(), // Allow both email and username
+  password: z.string().min(4) // Relaxed length for 'keethu' (6 chars)
 });
 
 export const authRoutes = Router();

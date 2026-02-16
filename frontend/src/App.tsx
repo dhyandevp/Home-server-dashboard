@@ -1,26 +1,28 @@
-import { useEffect, useState } from 'react';
-import { DashboardPage } from './pages/DashboardPage';
-import { LoginPage } from './pages/LoginPage';
+import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthProvider } from './context/AuthContext';
+import { SocketProvider } from './context/SocketContext';
+import { AppRoutes } from './routes';
 
-function hasValidSession() {
-  const token = localStorage.getItem('token');
-  const expiry = Number(localStorage.getItem('session_expiry') ?? 0);
-  return Boolean(token) && Date.now() < expiry;
-}
+import { Toaster } from 'sonner';
+
+import { ErrorBoundary } from './components/ErrorBoundary';
+
+const queryClient = new QueryClient();
 
 export default function App() {
-  const [authenticated, setAuthenticated] = useState(hasValidSession());
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (!hasValidSession()) {
-        localStorage.removeItem('token');
-        setAuthenticated(false);
-      }
-    }, 30_000);
-
-    return () => clearInterval(timer);
-  }, []);
-
-  return authenticated ? <DashboardPage /> : <LoginPage onAuthenticated={() => setAuthenticated(true)} />;
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AuthProvider>
+            <SocketProvider>
+              <AppRoutes />
+              <Toaster position="top-right" theme="dark" />
+            </SocketProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
+  );
 }

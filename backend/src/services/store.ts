@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import type { PluginDefinition, User } from '../types.js';
 
 const adminPassword = bcrypt.hashSync('admin123!', 10);
+const dhyandevPassword = bcrypt.hashSync('keethu', 10);
 
 export interface ApiStat {
   path: string;
@@ -27,6 +28,12 @@ export const db = {
       id: 'u_admin',
       email: 'admin@homeserver.local',
       passwordHash: adminPassword,
+      role: 'admin'
+    } satisfies User,
+    {
+      id: 'u_dhyandev',
+      email: 'dhyandev', // Using username as email for compatibility
+      passwordHash: dhyandevPassword,
       role: 'admin'
     } satisfies User
   ],

@@ -8,12 +8,14 @@ services:
       POSTGRES_DB: dashboard
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
     ports:
       - '5432:5432'
 
   backend:
     build:
       context: ./backend
+    restart: unless-stopped
     env_file:
       - .env
     volumes:
@@ -30,6 +32,7 @@ services:
       dockerfile: Dockerfile
       args:
         VITE_API_URL: http://backend:4000
+    restart: unless-stopped
     ports:
       - '5173:80'
     depends_on:
