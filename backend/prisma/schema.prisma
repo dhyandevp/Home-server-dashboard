@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model User {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  passwordHash String
+  role         Role        @default(USER)
+  lastLoginIp  String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  auditLogs    AuditLog[]
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  resource  String
+  details   Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([createdAt])
+  @@index([action])
+}
+
+model Plugin {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  name        String
+  description String
+  enabled     Boolean  @default(false)
+  source      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AlertRule {
+  id           String   @id @default(cuid())
+  metric       String
+  threshold    Float
+  channel      String
+  destination  String
+  enabled      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model ProxyRoute {
+  id          String   @id @default(cuid())
+  domain      String   @unique
+  target      String
+  sslEnabled  Boolean  @default(true)
+  containerId String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

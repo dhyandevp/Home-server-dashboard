@@ -1,143 +1,135 @@
-# 🏠 Minimalist Home Server Dashboard — DEMO
+# Home Server Management Platform
 
-⚠️ **Note:** This is a demo version. While the full working version exists, it cannot be shared. You are encouraged to make any changes you see fit in this demo.
+A lightweight, production-ready homelab control panel inspired by UmbrelOS/CasaOS/TrueNAS SCALE with a modular architecture.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
+## Architecture Summary
+Detailed architecture and scaling design is documented in `docs/ARCHITECTURE.md`.
 
-## 🔒 Why This is a Demo Version
+### Stack
+- **Frontend**: React + Vite + Tailwind (dark-first responsive UI)
+- **Backend**: Express + Socket.IO (REST + realtime)
+- **Database**: PostgreSQL schema via Prisma (`backend/prisma/schema.prisma`)
+- **Container runtime**: Docker socket integration (`dockerode`)
 
-The full production version of this dashboard includes sensitive configurations and security implementations that cannot be publicly shared:
+## Folder Structure
 
-- **Security Concerns:** Real authentication systems, API keys, server endpoints, and security tokens
-- **Privacy Issues:** Personal network configurations, internal IP addresses, and private service URLs
-- **Custom Integrations:** Proprietary connections to personal services and hardware
-- **Database Credentials:** Sensitive connection strings and authentication details
-- **Legal Considerations:** Third-party service integrations with usage restrictions
+```text
+.
+├── backend
+│   ├── prisma
+│   │   └── schema.prisma
+│   ├── src
+│   │   ├── config
+│   │   ├── middleware
+│   │   ├── plugins
+│   │   ├── routes
+│   │   ├── services
+│   │   ├── ws
+│   │   ├── app.ts
+│   │   └── server.ts
+│   ├── tests
+│   └── Dockerfile
+├── frontend
+│   ├── src
+│   │   ├── components
+│   │   ├── hooks
+│   │   ├── pages
+│   │   ├── services
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   └── Dockerfile
+├── docs
+│   └── ARCHITECTURE.md
+├── docker-compose.yml
+└── .env.example
+```
 
-This demo provides the core functionality and UI/UX experience while using simulated data and client-side storage only.
+## Database Schema
+Defined in `backend/prisma/schema.prisma` with production entities:
+- `User` (auth + RBAC)
+- `AuditLog` (security/event trail)
+- `Plugin` (marketplace registry)
+- `AlertRule` (monitoring/notification thresholds)
+- `ProxyRoute` (reverse proxy manager records)
 
-## ✨ Features (Local Demo)
+## Feature-by-Feature Implementation
 
-### Available in Demo:
-- **Single File Architecture** — Everything lives in `index.html`. Open directly in your browser.
-- **Local-Only Security** — Client-side login (Default: `dhyandev` / `keerthana`).
-- **Customizable Themes** — Light/Dark mode, accent colors, background images (local changes only).
-- **Local Persistence** — Notes, settings, and uploaded posters are saved in your browser (localStorage).
-- **Smart Widgets:**
-  - **Weather:** Auto-locates your city using Open-Meteo API.
-  - **System Stats:** Simulated CPU, RAM, Disk usage.
-  - **App Launcher:** Quick links to home services (Jellyfin, Pi-hole, etc.).
-  - **Poster Wall:** Upload and manage a personal media wall.
-  - **Notes Widget:** Save quick notes locally.
-  - **Clock & Calendar:** Real-time local time and date.
-  - **Custom Links:** Add and organize your own local server URLs.
-  - **Theme Presets:** Switch between prebuilt themes or customize your own.
+### 1) Dashboard Overview
+- Realtime CPU/RAM/Disk/Network/Uptime/Temperature via `Socket.IO` metric events.
+- Frontend metric cards and telemetry panels.
 
-⚠️ **Important:** This demo is intended for local use only and is not secure for public hosting.
+### 2) Docker Manager
+- List containers, start/stop/restart endpoints, and container logs endpoint.
+- Graceful fallback when Docker API is unavailable.
 
-## 🚀 Professional Features (Full Version Only)
+### 3) Service Marketplace (Plugin System)
+- Auto-discovery of plugin descriptors from `backend/src/plugins/*.json`.
+- Enable/disable plugins through API.
 
-The production version includes enterprise-grade features not available in this demo:
+### 4) Reverse Proxy Manager
+- Domain + upstream registration endpoint.
+- Auto-generated Nginx server block preview in API response.
 
-### Security & Authentication
-- **Multi-User Support** — Role-based access control (Admin, User, Guest)
-- **OAuth Integration** — Login with Authentik, Authelia, or Keycloak
-- **2FA/MFA** — Two-factor authentication via TOTP or hardware keys
-- **Session Management** — Secure token-based sessions with auto-expiration
-- **SSL/TLS Encryption** — End-to-end encrypted communications
-- **Audit Logs** — Track all user actions and system events
+### 5) File Manager
+- Sandboxed directory read/write/list/upload endpoints.
+- Root protection via `FILE_MANAGER_ROOT` path resolver.
 
-### Real System Monitoring
-- **Live Docker Stats** — Real-time container monitoring (CPU, memory, network, status)
-- **Hardware Metrics** — Actual CPU temperature, disk I/O, network throughput
-- **Service Health Checks** — Automatic ping monitoring for all services
-- **Alert System** — Email/SMS/Push notifications for downtime or threshold breaches
-- **Historical Data** — Performance graphs and trends over time (powered by InfluxDB/Prometheus)
-- **Resource Predictions** — AI-powered capacity planning and usage forecasts
+### 6) Logs Center
+- Audit log collection service and API endpoint.
 
-### Advanced Integrations
-- **Docker Management** — Start/stop/restart containers directly from dashboard
-- **Portainer Integration** — Full container orchestration
-- **Proxmox/ESXi Support** — VM management and monitoring
-- **Database Connections** — Direct queries to PostgreSQL, MySQL, MongoDB
-- **Home Automation** — Smart home device control (Home Assistant, MQTT)
-- **Media Server APIs** — Deep integration with Plex/Jellyfin/Emby (watch history, recommendations)
-- **Network Tools** — Wake-on-LAN, port scanning, bandwidth monitoring
+### 7) Monitoring & Alerts
+- Alert rule CRUD scaffold (`metric`, `threshold`, `channel`, `destination`).
 
-### Data & Backup
-- **Centralized Logging** — Aggregated logs from all services (Loki, Elasticsearch)
-- **Automated Backups** — Scheduled snapshots with version control
-- **Cloud Sync** — Optional sync to personal cloud storage (Nextcloud, S3)
-- **Export/Import** — Full dashboard configuration portability
+### 8) Authentication & Security
+- JWT login, role checks, rate limiting, helmet headers, and IP-aware audit logs.
 
-### Communication & Collaboration
-- **RSS Feed Reader** — Aggregate news and updates
-- **Notification Center** — Unified inbox for all system alerts
-- **Calendar Integration** — Sync with CalDAV/Google Calendar
-- **Task Management** — Built-in to-do lists with reminders
-- **File Browser** — Navigate and manage server files (SMB/NFS shares)
+### 9) API Layer
+- REST routes under `/api/*`.
+- Swagger docs at `/docs`.
 
-### Performance & Scalability
-- **Caching Layer** — Redis-powered for instant load times
-- **WebSocket Connections** — Real-time updates without page refresh
-- **Mobile App** — Native iOS/Android apps with offline support
-- **API Access** — RESTful API for third-party integrations
-- **Multi-Server Support** — Manage multiple home servers from one dashboard
+### 10) Mobile Mode
+- Responsive Tailwind grid layouts and touch-friendly controls.
 
-### Customization & Automation
-- **Widget Marketplace** — Install community-created widgets
-- **Custom Scripts** — Run bash/Python scripts with one click
-- **Automation Rules** — If-this-then-that logic for smart workflows
-- **Voice Commands** — Control dashboard via voice assistant integration
-- **Public/Private Mode** — Guest view with limited access to non-sensitive data
+## Run Locally
 
-## 🎯 Getting Started
+```bash
+npm install
+npm run dev:backend
+npm run dev:frontend
+```
 
-1. Download `index.html`.
-2. Open it in a modern browser on your home server or local machine.
-3. Login with default credentials:
-   - **User:** `dhyandev`
-   - **Pass:** `keerthana`
-4. Explore widgets, upload posters or notes, and customize your dashboard — all changes are saved locally.
+Default login:
+- email: `admin@homeserver.local`
+- password: `admin123!`
 
-## ⚙️ Configuration
+## Testing
 
-Click the **Settings Gear (⚙️)** to:
+```bash
+npm --workspace backend run test
+npm --workspace frontend run test
+```
 
-- Set your **Display Name**.
-- Enter **City Coordinates** (Lat/Lon) for accurate weather.
-- Paste a **Background Image URL** for custom wallpapers.
-- Add custom app links for your home server.
+## Deployment (Dockerized)
 
-**Backup:** Save the `index.html` file to retain your settings and uploaded content.
+```bash
+cp .env.example .env
+docker compose up --build
+```
 
-## 🛠️ Tech Stack
+Services:
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:4000`
+- Swagger: `http://localhost:4000/docs`
 
-### Demo Version:
-- **HTML5 & CSS3** — Modern theming with CSS variables and Glassmorphism.
-- **JavaScript (ES6+)** — Vanilla JS, no frameworks.
-- **Font Awesome** — Icon library via CDN.
-- **Google Fonts** — Inter font via CDN.
+## Security Recommendations
+- Replace default JWT secret and admin seed password before first run.
+- Put backend behind TLS reverse proxy (Nginx/Caddy/Traefik).
+- Restrict Docker socket mount to trusted hosts only.
+- Add persistent DB layer (Prisma migrations + managed Postgres backups).
+- Enable 2FA/TOTP in next iteration.
 
-### Full Version (Additional):
-- **Backend:** Node.js/Python Flask with Express/FastAPI
-- **Database:** PostgreSQL, Redis
-- **Monitoring:** Prometheus, Grafana, InfluxDB
-- **Containerization:** Docker, Docker Compose
-- **Authentication:** OAuth 2.0, JWT tokens
-- **Real-time:** WebSocket (Socket.io)
-- **APIs:** Docker Engine API, System APIs (psutil)
-
-## 🔐 Security Notice
-
-This demo uses client-side authentication which is **NOT SECURE** for production use. The full version implements:
-- Server-side authentication with password hashing (bcrypt/Argon2)
-- Rate limiting and brute force protection
-- CSRF token validation
-- Content Security Policy (CSP) headers
-- Regular security audits and updates
-
-## 📄 License
-
-MIT License — free to use and modify for personal, local use only.
+## Performance Tips
+- Reduce metric emission frequency in `ws/socket.ts` for low-power devices.
+- Add Redis cache for plugin/metrics snapshots in multi-node setups.
+- Paginate large log queries and stream download exports.
+- Use frontend code splitting for plugin-specific panels.

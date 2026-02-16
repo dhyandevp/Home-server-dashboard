@@ -1,0 +1,7 @@
+{
+  "key": "home-assistant",
+  "name": "Home Assistant Monitor",
+  "description": "Track automations, entities, and server health.",
+  "enabled": false,
+  "source": "core"
+}
