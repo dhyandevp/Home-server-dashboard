@@ -7,6 +7,13 @@ export interface Metrics {
     uptime: number;
     temperature: number | null;
     at: string;
+    processes?: Array<{
+        pid: number;
+        name: string;
+        cpu: number;
+        mem: number;
+        user: string;
+    }>;
 }
 
 export interface ContainerSummary {

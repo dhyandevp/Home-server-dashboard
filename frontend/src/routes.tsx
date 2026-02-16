@@ -5,6 +5,7 @@ import { useAuth } from './context/AuthContext';
 
 // Lazy load apps
 const ObservabilityApp = lazy(() => import('./apps/observability/ObservabilityApp').then(module => ({ default: module.ObservabilityApp })));
+const ContainersApp = lazy(() => import('./apps/containers/ContainersApp').then(module => ({ default: module.ContainersApp })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then(module => ({ default: module.LoginPage })));
 
 function LoadingFallback() {
@@ -43,7 +44,7 @@ export function AppRoutes() {
                 <Route path="/login" element={<LoginPage />} />
 
                 <Route path="/" element={<ProtectedRoute><ObservabilityApp /></ProtectedRoute>} />
-                <Route path="/containers" element={<ProtectedRoute><div className="text-white">Containers Module (Loading...)</div></ProtectedRoute>} />
+                <Route path="/containers" element={<ProtectedRoute><ContainersApp /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute><div className="text-white">System Configuration (Loading...)</div></ProtectedRoute>} />
             </Routes>
         </Suspense>

@@ -7,8 +7,14 @@ export const metricsRoutes = Router();
 
 metricsRoutes.get('/current', async (_req, res) => {
   const data = await getSystemSnapshot();
-  metricsHistoryService.append(data);
-  alertsService.evaluate(data);
+
+  // Extract processes to exclude from history
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { processes, ...historyData } = data;
+
+  metricsHistoryService.append(historyData as any); // Cast avoiding strict typecheck for now
+  alertsService.evaluate(historyData as any);
+
   res.json(data);
 });
 

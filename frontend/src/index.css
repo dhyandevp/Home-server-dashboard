@@ -22,5 +22,5 @@ button {
 }
 
 button:focus-visible {
-  @apply outline-none ring-1 ring-active;
+  @apply outline-none ring-1 ring-cyan-500;
 }
